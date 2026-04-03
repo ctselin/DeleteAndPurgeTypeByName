@@ -1,4 +1,4 @@
-# DeleteAndPurgeTypeByName# Nuclear Revit Type Purger (DeleteAndPurgeTypeByName.dyn)
+# Nuclear Revit Type Purger (DeleteAndPurgeTypeByName.dyn)
 
 A powerful, highly resilient Dynamo script designed for Autodesk Revit that hunts down specific element types by their name, forcefully removes all instances of that type placed in the model, and then permanently purges the underlying type definitions from your project database.
 
