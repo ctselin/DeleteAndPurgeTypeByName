@@ -31,4 +31,4 @@ If the script reports `0 destroyed`:
 - **Engine:** Built and tested explicitly against CPython3 in Dynamo.
 - **API Security Bypass:** Avoids `FilteredElementCollector` unfiltered blockages by concatenating `WhereElementIsElementType()` and `WhereElementIsNotElementType()` arrays.
 
-I didnt write this, AI did
+Done by Antigravity via Dynamo MCP https://github.com/ruvnet/dynamo-mcp
