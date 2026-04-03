@@ -30,3 +30,5 @@ If the script reports `0 destroyed`:
 ## 🛠️ Technical Details
 - **Engine:** Built and tested explicitly against CPython3 in Dynamo.
 - **API Security Bypass:** Avoids `FilteredElementCollector` unfiltered blockages by concatenating `WhereElementIsElementType()` and `WhereElementIsNotElementType()` arrays.
+
+I didnt write this, AI did
