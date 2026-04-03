@@ -1,0 +1,151 @@
+{
+  "Uuid": "7184f834-c2e2-4da0-b264-21503cadb1f3",
+  "IsCustomNode": false,
+  "Description": "Deletes and purges specific element types by their string Name",
+  "Name": "DeleteAndPurgeTypeByName",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "CoreNodeModels.Input.StringInput, CoreNodeModels",
+      "SerializedWidth": 0.0,
+      "SerializedHeight": 0.0,
+      "Id": "ec8c5e97518340aba3991a320de0584d",
+      "NodeType": "StringInputNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "a43f92bbb98f48a5b83e4074a4b67923",
+          "Name": "",
+          "Description": "String",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Creates a string.",
+      "InputValue": "Ben"
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\nclr.AddReference('RevitAPI')\r\nfrom Autodesk.Revit.DB import *\r\n\r\nclr.AddReference('RevitServices')\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager\r\nfrom RevitServices.Transactions import TransactionManager\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\n\r\ninput_names = UnwrapElement(IN[0])\r\nif not isinstance(input_names, list):\r\n    input_names = [input_names]\r\n    \r\ninput_names = [str(n).strip().lower() for n in input_names if n]\r\n\r\ndeleted_elements_count = 0\r\nerrors = []\r\nfound_names = []\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\ntypes = FilteredElementCollector(doc).WhereElementIsElementType().ToElements()\r\ninstances = FilteredElementCollector(doc).WhereElementIsNotElementType().ToElements()\r\nall_elems = list(types) + list(instances)\r\n\r\nelements_to_delete = []\r\nfor e in all_elems:\r\n    try:\r\n        if not e.IsValidObject:\r\n            continue\r\n        if not hasattr(e, \"Name\") or not e.Name:\r\n            continue\r\n            \r\n        e_name = e.Name.strip().lower()\r\n        for search_name in input_names:\r\n            if search_name == e_name:\r\n                elements_to_delete.append(e)\r\n                found_names.append(e.Name)\r\n            elif search_name in e_name and len(search_name) > 2:\r\n                hint = \"Hint: Found '\" + e.Name + \"'\"\r\n                if hint not in errors:\r\n                    errors.append(hint)\r\n    except:\r\n        pass\r\n\r\nif not elements_to_delete:\r\n    errors.append(\"ERROR: Could not find any exact match for your input.\")\r\n\r\nfor elem in elements_to_delete:\r\n    try:\r\n        # Extremely safe verification to prevent InvalidObjectException\r\n        if not elem.IsValidObject:\r\n            continue\r\n            \r\n        doc.Delete(elem.Id)\r\n        deleted_elements_count += 1\r\n    except Exception as e:\r\n        pass\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = [\r\n    \"SUCCESS! Items destroyed: \" + str(deleted_elements_count),\r\n    \"Destroyed Names: \" + str(found_names),\r\n    \"Hints log: \" + str(errors)\r\n]",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "0517ff31c25a49fca456f5565bd4167d",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "1e7d9e07cbf34e82b2dd9dca9261a468",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "aa0b11a984f64cfdbdbd85d94805ce6a",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "a43f92bbb98f48a5b83e4074a4b67923",
+      "End": "1e7d9e07cbf34e82b2dd9dca9261a468",
+      "Id": "66489637bcaa4f6fa9e220f3d86a01d4",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": null,
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.6",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "9.1",
+      "Data": {}
+    }
+  ],
+  "Author": "None provided",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.6.0.9395",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "ec8c5e97518340aba3991a320de0584d",
+        "Name": "String",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 100.0,
+        "Y": 300.0
+      },
+      {
+        "Id": "0517ff31c25a49fca456f5565bd4167d",
+        "Name": "Python Script: Delete by Name",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 450.0,
+        "Y": 300.0
+      }
+    ],
+    "Annotations": [],
+    "X": -3.91167364160583,
+    "Y": 144.4961321947548,
+    "Zoom": 0.8679775076490156
+  }
+}
